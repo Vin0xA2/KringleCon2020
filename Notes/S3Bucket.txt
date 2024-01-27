@@ -1,0 +1,145 @@
+In-game terminal
+Objective: Get the text string from unwrapping the overwrapped file.
+Hints:
+  (The News) https://www.computerweekly.com/news/252491842/Leaky-AWS-S3-bucket-once-again-at-centre-of-data-breach
+  (The Blog) https://digi.ninja/blog/whats_in_amazons_buckets.php
+  (The Tool) https://digi.ninja/projects/bucket_finder.php
+  File is wrapped with multipl compression tools.
+  Find santa's "package" file.
+  (The talk) https://www.youtube.com/watch?v=t4UzXx5JHk0
+
+
+(Message Start of the in-game terminal)
+  Can you help me? Santa has been experimenting with new wrapping technology, and
+  we've run into a ribbon-curling nightmare!
+  We store our essential data assets in the cloud, and what a joy it's been!
+  Except I don't remember where, and the Wrapper3000 is on the fritz!
+
+  Can you find the missing package, and unwrap it all the way?
+
+  Hints: Use the file command to identify a file type. You can also examine
+  tool help using the man command. Search all man pages for a string such as
+  a file extension using the apropos command.
+
+  To see this help again, run cat /etc/motd.
+
+
+(See what's in the starting directory.)
+~$ ls -al
+  total 28
+  drwxr-xr-x 1 elf  elf  4096 Oct  1  2021 .
+  drwxr-xr-x 1 root root 4096 Oct  1  2021 ..
+  -rw-r--r-- 1 elf  elf   220 Apr 18  2019 .bash_logout
+  -rwxr-xr-x 1 elf  elf    90 Sep 20  2021 .bashrc
+  -rw-r--r-- 1 elf  elf   807 Apr 18  2019 .profile
+  -rw-r--r-- 1 elf  elf   179 Sep 20  2021 TIPS
+  drwxr-xr-x 1 elf  elf  4096 Oct  1  2021 bucket_finder
+
+
+(Bucket_finder is the tool we can use. Let's see what's there.)
+~$ cd bucket_finder/; ls -al
+  cd bucket_finder/; ls -al
+  total 28
+  drwxr-xr-x 1 elf elf 4096 Oct  1  2021 .
+  drwxr-xr-x 1 elf elf 4096 Oct  1  2021 ..
+  -rw-r--r-- 1 elf elf 2550 Sep 20  2021 README
+  -rwxr-xr-x 1 elf elf 9121 Sep 20  2021 bucket_finder.rb
+  -rw-r--r-- 1 elf elf   28 Sep 20  2021 wordlist
+
+
+(Read the wordlist.)
+~$ cat wordlist
+  kringlecastle
+  wrapper
+  santa
+
+
+(List is pretty small so we will just run it.)
+~$ ./bucket_finder.rb wordlist
+  http://s3.amazonaws.com/kringlecastle
+  Bucket found but access denied: kringlecastle
+  http://s3.amazonaws.com/wrapper
+  Bucket does not exist: wrapper
+  http://s3.amazonaws.com/santa
+  Bucket santa redirects to: santa.s3.amazonaws.com
+  http://santa.s3.amazonaws.com/
+        Bucket found but access denied: santa
+
+
+(No public ones. Let's try adding wrapper3000 to the wordlist.)
+~$ nano wordlist
+~$ ./bucket_finder.rb wordlist
+  http://s3.amazonaws.com/kringlecastle
+  Bucket found but access denied: kringlecastle
+  http://s3.amazonaws.com/wrapper
+  Bucket does not exist: wrapper
+  http://s3.amazonaws.com/santa
+  Bucket santa redirects to: santa.s3.amazonaws.com
+  http://santa.s3.amazonaws.com/
+        Bucket found but access denied: santa
+  http://s3.amazonaws.com/wrapper3000
+  Bucket Found: wrapper3000 ( http://s3.amazonaws.com/wrapper3000 )
+        <Public> http://s3.amazonaws.com/wrapper3000/package
+
+
+(wrapper3000 is a hit and it has the package file. Rerun the script and download it.)
+~$ ./bucket_finder.rb wordlist --download
+
+
+(Go to the wrapper3000 directory and analyze the package file.)
+~$ cd wrapper3000/;file package
+  package: ASCII text, with very long lines
+
+
+(It's a text file, see what's inside.)
+~$ cat package
+  UEsDBAoAAAAAAIAwhFEbRT8anwEAAJ8BAAAcABwAcGFja2FnZS50eHQuWi54ei54eGQudGFyLmJ6MlVUCQADoBfKX6AXyl91eAsAAQT2AQAABBQAAABCWmg5MUFZJlNZ2ktivwABHv+Q3hASgGSn//AvBxDwf/xe0gQAAAgwAVmkYRTKe1PVM9U0ekMg2poAAAGgPUPUGqehhCMSgaBoAD1NNAAAAyEmJpR5QGg0bSPU/VA0eo9IaHqBkxw2YZK2NUASOegDIzwMXMHBCFACgIEvQ2Jrg8V50tDjh61Pt3Q8CmgpFFunc1Ipui+SqsYB04M/gWKKc0Vs2DXkzeJmiktINqjo3JjKAA4dLgLtPN15oADLe80tnfLGXhIWaJMiEeSX992uxodRJ6EAzIFzqSbWtnNqCTEDML9AK7HHSzyyBYKwCFBVJh17T636a6YgyjX0eE0IsCbjcBkRPgkKz6q0okb1sWicMaky2Mgsqw2nUm5ayPHUeIktnBIvkiUWxYEiRs5nFOM8MTk8SitV7lcxOKst2QedSxZ851ceDQexsLsJ3C89Z/gQ6Xn6KBKqFsKyTkaqO+1FgmImtHKoJkMctd2B9JkcwvMr+hWIEcIQjAZGhSKYNPxHJFqJ3t32Vjgn/OGdQJiIHv4u5IpwoSG0lsV+UEsBAh4DCgAAAAAAgDCEURtFPxqfAQAAnwEAABwAGAAAAAAAAAAAAKSBAAAAAHBhY2thZ2UudHh0LloueHoueHhkLnRhci5iejJVVAUAA6AXyl91eAsAAQT2AQAABBQAAABQSwUGAAAAAAEAAQBiAAAA9QEAAAAA
+
+
+(Looks like base64, let's decode it.)
+$ base64 -d package > package1; file package1
+  package1: Zip archive data, at least v1.0 to extract
+
+
+(Unzip)
+~$ unzip package1
+  Archive:  package1
+   extracting: package.txt.Z.xz.xxd.tar.bz2
+
+
+(Check file)
+~$ file package.txt.Z.xz.xxd.tar.bz2
+  package.txt.Z.xz.xxd.tar.bz2: bzip2 compressed data, block size = 900k
+
+
+(Bzip2 decompress)
+~$ bzip2 -d package.txt.Z.xz.xxd.tar.bz2
+~$ file package.txt.Z.xz.xxd.tar
+  package.txt.Z.xz.xxd.tar: POSIX tar archive
+
+
+(Untar/extract)
+~$ tar -xf package.txt.Z.xz.xxd.tar
+~$ file package.txt.Z.xz.xxd
+  package.txt.Z.xz.xxd: ASCII text
+
+
+(Reverse hexdump)
+~$ xxd -r package.txt.Z.xz.xxd package.txt.Z.xz
+~$ file package.txt.Z.xz
+  package.txt.Z.xz: XZ compressed data
+
+
+(XZ decompress)
+~$ xz -d package.txt.Z.xz
+~$ file package.txt.Z
+  package.txt.Z: compress'd data 16 bits
+
+
+(Uncompress)
+~$ uncompress package.txt.Z
+
+
+(Read the file for the answer.)
+~$ cat package.txt
+  North Pole: The Frostiest Place on Earth

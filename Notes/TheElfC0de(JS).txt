@@ -1,0 +1,139 @@
+In-game terminal
+Objective: Complete the javascript code challenges.
+Hints:
+  https://jgthms.com/javascript-in-14-minutes/
+  (Playground) https://playcode.io/
+  (Compressor) https://jscompress.com/
+  (typeof) https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof
+  (typeof in array) https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray/filter
+  (enum keys) https://stackoverflow.com/questions/9907419/how-to-get-a-key-in-a-javascript-object-by-its-value
+
+
+==Level 1==
+(Info: Program the elf to the end goal in no more than 2 lines of code and no more than 2 elf commands.)
+elf.moveLeft(10)
+elf.moveUp(10)
+
+
+==Level 2==(Trigger The Yeeter)
+(Info: Program the elf to the end goal in no more than 5 lines of code and no more than 5 elf command/function execution statements in your code.)
+elf.moveLeft(6)
+elf.pull_lever(elf.get_lever(0)+2)
+elf.moveLeft(4)
+elf.moveUp(10)
+
+
+==Level 3==(Move To Loopiness)
+(Info: Program the elf to the end goal in no more than 4 lines of code and no more than 4 elf command/function execution statements in your code.)
+elf.moveTo(lollipop[0])
+elf.moveTo(lollipop[1])
+elf.moveTo(lollipop[2])
+elf.moveUp(1)
+
+
+==Level 4==(Up Down Loopiness)
+(Info: Program the elf to the end goal in no more than 7 lines of code and no more than 6 elf command/function execution statements in your code.)
+for (let i = 0; i < 3; i++) {
+  elf.moveLeft(3)
+  elf.moveUp(11)
+  elf.moveLeft(2)
+  elf.moveDown(11)
+}
+
+
+==Level 5==(Move To Madness)
+(Info: Program the elf to the end goal in no more than 10 lines of code and no more than 5 elf command/function execution statements in your code.)
+elf.moveTo(lollipop[0])
+const mArray = elf.ask_munch(0)
+const mAnswer = []
+for (let i = 0; i < mArray.length; i++) {
+  if (typeof mArray[i] == 'number') {
+    mAnswer.push(mArray[i])
+  }
+}
+elf.tell_munch(mAnswer)
+elf.moveUp(2)
+
+
+==Level 6==(Two Paths, Lever)
+(Info: Program the elf to the end goal in no more than 15 lines of code and no more than 7 elf command/function execution statements in your code.)
+for (let i = 0; i < 4; i++) {
+  elf.moveTo(lollipop[i])
+}
+elf.moveTo(lever[0])
+const mAnswer = ["munchkins rule"]
+elf.pull_lever(mAnswer.concat(elf.get_lever(0)))
+elf.moveTo({"x":2,"y":4})
+elf.moveUp(2)
+
+
+==Level 6==(Two Paths, Munchkin)
+(Info: Program the elf to the end goal in no more than 15 lines of code and no more than 7 elf command/function execution statements in your code.)
+for (let i = 0; i < 4; i++) {
+  elf.moveTo(lollipop[i])
+}
+elf.moveTo({"x":2,"y":4})
+const mJSON = Object.entries(elf.ask_munch(0))
+for (let i = 0; i < mJSON.length; i++) {
+  if (mJSON[i][1] === "lollipop") {
+    mAnswer = mJSON[i][0]
+  }
+}
+elf.tell_munch(mAnswer)
+elf.moveUp(2)
+
+
+==Level 6==(Munchkin path note)
+The for-in (below) loop doesn't seem to work for some reason.
+  for (let key in jsonObject) { }
+
+
+==Level 7==(Yeeter Swirl, Bonus)
+(Info: Program the elf to the end goal in no more than 25 lines of code and no more than 10 elf command/function execution statements in your code.)
+const direction = [elf.moveDown,elf.moveLeft,elf.moveUp,elf.moveRight,elf.moveDown,elf.moveLeft,elf.moveUp,elf.moveRight]
+for (let i = 0; i < 8; i++) {
+  direction[i](i+1)
+  elf.pull_lever(i)
+}
+elf.moveUp(2)
+elf.moveLeft(4)
+elf.tell_munch(arraySum)
+elf.moveUp(1)
+
+function arraySum(mArray) {
+  var sum = 0
+  for (let i = 0; i < mArray.length; i++) {
+    for (let j = 0; j < mArray[i].length; j++) {
+      if (typeof mArray[i][j] === 'number') {
+        sum += mArray[i][j]
+      }
+    }
+  }
+  return sum
+}
+
+
+==Level 8==(For Loop Finale, bonus)
+(Info: Program the elf to the end goal in no more than 40 lines of code and no more than 10 elf command/function execution statements in your code.)
+const direction = [elf.moveRight,elf.moveLeft]
+var num = 0
+for (let i = 0; i < 6; i++) {
+  direction[i%2](2*i+1)
+  num += elf.get_lever(i)
+  elf.pull_lever(num)
+  elf.moveUp(2)
+}
+elf.tell_munch(lollipopFunction)
+elf.moveRight(11)
+
+function lollipopFunction(mArray) {
+  for (let i = 0; i < mArray.length; i++) {
+    const mJSON = Object.entries(mArray[i])
+    for (let j = 0; j < mJSON.length; j++) {
+      if (mJSON[j][1] === "lollipop") {
+        mAnswer = mJSON[j][0]
+      }
+    }
+  }
+  return mAnswer
+}

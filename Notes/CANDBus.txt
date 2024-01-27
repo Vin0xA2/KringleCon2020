@@ -1,0 +1,62 @@
+In-game terminal
+Objective: Jack Frost inserted malicious messages. Exclude those messages to fix the sleigh.
+Hints:
+  Try filtering out one CAN-ID at a time to see what each might pertain to.
+  Something's up with the brakes and doors.
+
+
+(Initial load)
+  CANDInitial.jpg
+
+
+(The log continuously cycles through so it's hard to read. Taking a screen makes it easier.)
+(Let's filter out all the lines.)
+   ID  Operator  Criterion
+  188  Equals    000000000000
+  244  Equals    000000000000
+  080  Equals    000000000000
+  019  Equals    000000000000
+  19B  Equals    0000000F2057
+
+
+(Play around with different buttons and sliders we get the follow.)
+  19B#00000F000000 = Unlock
+  19B#000000000000 = Lock
+  02A#0000FF       = Stop
+  02A#00FF00       = Start
+  244#0000000000   = RPM Value (Affected by Accelerator when engine started)
+  019#00000000     = Steering
+  080#000000       = Brake
+
+
+(With Brake at 100)
+  ...
+  1697249696813 080#000064
+  1697249696911 080#FFFFF0
+  1697249697314 080#000064
+  1697249697415 080#FFFFF3
+  1697249697818 080#000064
+  1697249697921 080#FFFFFA
+  ...
+
+
+(With Brake at 50)
+  ...
+  1697249840752 080#000032
+  1697249840853 080#FFFFF8
+  1697249841256 080#000032
+  1697249841359 080#FFFFF0
+  1697249841866 080#000032
+  1697249841967 080#FFFFF3
+  ..
+
+
+(64 hex = 100 dec and 32 hex = 50 dec so the lines with F's are negative values and should be filtered.)
+(As for the door, 19B#0000000F2057 from initial load is odd since it's neither lock or unlock. Keep that filtered.)
+(Other filters should be fine to remove and leaving with the following.)
+   ID  Operator  Criterion
+  19B  Equals    0000000F2057
+  080  Less      000000000000
+
+
+Success!!

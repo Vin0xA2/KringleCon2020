@@ -1,0 +1,21 @@
+In-game terminal
+Objective: Dial 756-8347 and replicate the dial-up connection sound.
+
+
+(Available "sounds")
+  beDURRdundityy
+  SCHHRRHHRTHRTR
+  aaah
+  baa DEE brrr
+  WEWEWwrwrrwrr
+
+
+(Pick up phone, dial the number, and reply each noise with each "sound" below.)
+  baa DEE brrr
+  aaah
+  WEWEWwrwrrwrr
+  beDURRdundityy
+  SCHHRRHHRTHRTR
+
+
+"Your lights have been updated"

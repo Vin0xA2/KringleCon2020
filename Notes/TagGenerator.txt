@@ -1,0 +1,13 @@
+https://tag-generator.kringlecastle.com/
+Objective: Fix the tag generator and get value of environment variable GREETZ.
+Hints:
+  Is there an endpoint that will print arbitrary files?
+  Vulnerability in the source, Jack might leave their mark.
+  Get path to the file and download it.
+  Get the source code!
+  Path to the script might be on error pages.
+  Blind code execution => redirect to file and download it.
+  Processes in the background, might need to few a few minutes.
+  Careful with the Content-Type, browser might try to help (badly).
+
+

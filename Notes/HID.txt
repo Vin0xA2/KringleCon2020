@@ -1,0 +1,38 @@
+In-game objective
+Objective: Open the HID lock in the Workshop.
+Hints:
+  https://www.youtube.com/watch?v=647U85Phxgo
+  https://gist.github.com/joswr1ght/efdb669d2f3feb018a22650ddc01f5f2
+  Proxmark is a multi-function RFID device. Capture and replay RFIDs.
+  Use a Proxmark to capture facility code and ID with lf hid read
+  Use a Proxmark to impersonate a badge with lf hid sim -r 2006......
+
+
+(The Proxmark is on the Workshop floor, backroom, near the middle.)
+(Stand next to Noel Boetie, in the same room, and capture their RFID card.)
+[magicdust] pm3 --> lf hid read
+  #db# TAG ID: 2006e22f08 (6020) - Format Len: 26 bit - FC: 113 - Card: 6020
+
+
+(Others with tag IDs.)
+  Sparkle Redberry: 2006e22f0d (6022) -- by first floor of Santavator.
+  Angle Candysalt: 2006e22f31 (6040) -- in room right castle entrance.
+  Holly Evergreen: 2006e22f10 (6024) -- in the kitchen (back left door from previous).
+  Bow Ninecandle: 2006e22f0e (6023) -- middle of the 2nd floor.
+
+
+(Go back to the first Workshop room and stand next to the door on the left wall.)
+(Replay the badges. Bow Ninecandle's badge is the one that opens the door.)
+[magicdust] pm3 --> lf hid sim -r 2006e22f0e 
+  [=] Simulating HID tag using raw 2006e22f0e
+  [=] Stopping simulation after 10 seconds.
+
+
+  [=] Done
+
+
+Success!!
+
+
+(Go through to the next room to unlock other challenges.)
+(Go down to the 2 white dots at the bottom of the room to control Santa on the first floor.)

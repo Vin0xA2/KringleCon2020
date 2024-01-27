@@ -1,0 +1,74 @@
+In-game terminal
+Objective: Complete 8 regex challenges.
+Hints:
+  https://www.debuggex.com/cheatsheet/regex/javascript
+  https://regex101.com/
+
+
+(1. Create a regular expression that will only match any string containing at least one digit.)
+\d
+
+
+(2. Create a regular expression that will only match only alpha characters A-Z of at least 3 characters in length or greater while ignoring case.)
+[a-z,A-Z]{3,}
+
+
+(3. Create a regular expression that will only match at least two consecutive lowercase a-z or numeric characters.)
+[a-z,0-9]{2,}
+
+
+(4. Create a regular expression that will only match any two characters that are NOT uppercase A through L and NOT numbers 1 through 5.)
+[^A-L,1-5]{2}
+
+
+(5. Create a regular expression that only matches if the entire string is composed of entirely digits and is at least 3 characters in length.)
+\b[0-9]{3,}\b
+^[0-9]{3,}$
+
+
+(6. Create a regular expression that only matches if the entire string is a valid Hour, Minute and Seconds time format.)
+      (Valid)       (Invalid)
+      12:24:53      25:30:86
+      1:05:24       A1:E4:B5
+      23:02:43      B2:13:4A
+      08:04:10      32:24:53
+                    08:74:53
+                    12:5:24
+(Use anchors or boundary markers to avoid matching other surrounding strings.)
+^(([0-1]?[0-9])|(2[0-3]))\:[0-5][0-9]\:[0-5][0-9]$
+^(([0-1]?[0-9])|(2[0-3]))(\:[0-5][0-9]){2}$
+
+
+(7. Create a regular expression that only matches if the entire string is a MAC address.)
+      (Valid)                (Invalid)
+      00:0a:95:9d:68:16      97:z2:gf:c4:02:c2
+      76:A4:5A:D2:69:93      de:140:130:69:7_-bd
+      B8:13:13:D1:18:EC      C0:HH:EE:50:B7:C3
+      95:ce:00:4a:22:df
+(Use anchors or boundary markers to avoid matching other surrounding strings.)
+^([0-9,A-F,a-f]{2}\:){5}[0-9,A-F,a-f]{2}$
+
+
+(8. Create a regular expression that only matches one of the three following day, month, and four digit year format.)
+      (Valid)         (Invalid)
+      10/01/1978      05/25/89
+      01.10.1987      12-32-1989
+      14-12-1991      01.1.1989
+                      1/1/1
+(Use anchors or boundary markers to avoid matching other surrounding strings.)
+^((0[1-9])|([1-2][0-9])|(3[0-1]))(\/|\.|\-)((0[1-9])|(1[0-2]))\5\d{4}$
+
+
+Success!!
+
+
+(Special note for regex 8)
+It doesn't care about which month has 28, 29, 30, or 31 days.
+The \5 tells the expression to match on capturing group 5.
+Each ( is a capturing group.
+  1 => ((0[1-9])|([1-2][0-9])|(3[0-1]))
+  2 => (0[1-9])
+  3 => ([1-2][0-9])
+  4 => (3[0-1])
+  5 => (\/|\.|\-)
+We want to make sure the day/month/year delimiters match.

@@ -1,0 +1,18 @@
+On-Screen Image (https://2020.kringlecon.com/textures/billboard.png)
+Objective: Billboard at the entrance has a gift list. What is the gift for Josh Wright?
+Hint: Free tools available (https://www.photopea.com/)
+Reference: This is a promising tool (https://onlinejpgtools.com/)
+
+
+(At the start, zoom out to find the billboard in the up left and click on it)
+Windows: Hold Ctrl, - key or scroll down.
+https://2020.kringlecon.com/textures/billboard.png
+
+
+(Download the photo and upload it to photopea to edit)
+Filter > Liquify > Twirl (4th option down on the left)
+Size:400
+Hold LeftClick over selected area to clockwise twirl (Alt + LClick = CCW twirl)
+
+
+Answer: Proxmark

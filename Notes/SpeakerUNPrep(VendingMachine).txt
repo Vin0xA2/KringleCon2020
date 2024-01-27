@@ -1,0 +1,81 @@
+In-game terminal
+Objective: Get the password for the ./vending-machines binary.
+Hint:
+  Try deleting or rename the config to set the password ourselves to AAAAAAAA or BBBBBBBB.
+  Might be a simple rotation cypher.
+
+
+(Run the binary to get the initial message.)
+~$ ./vending-machines
+  The elves are hungry!
+
+  If the door's still closed or the lights are still off, you know because
+  you can hear them complaining about the turned-off vending machines!
+  You can probably make some friends if you can get them back on...
+
+  Loading configuration from: /home/elf/lab/vending-machines.json
+
+  I wonder what would happen if it couldn't find its config file? Maybe that's
+  something you could figure out in the lab...
+
+  Welcome, elf-maintenance! It looks like you want to turn the vending machines back on?
+  Please enter the vending-machine-back-on code >
+
+
+(See what's in the config file.)
+~$ cat vending-machines.json
+  {
+    "name": "elf-maintenance",
+    "password": "LVEdQPpBwr"
+  }
+
+
+(Let's try renaming the config file in the lab directory.)
+~$ cd lab/
+~$ mv vending-machines.json bending-machines.json
+~$ ./vending-machines
+  ...
+  ALERT! ALERT! Configuration file is missing! New Configuration File Creator Activated!
+  ...
+
+
+(Looks like it just prompts to create a new name and password. Let's do 10x A's since original password has 10 characters.)
+Please enter the name > 
+Please enter the password > AAAAAAAAAA
+  ...
+
+
+(Let's see what the new config file looks like.)
+~$ cat vending-machines.json
+  {
+    "name": "",
+    "password": "XiGRehmwXi"
+  }
+
+
+(Doing all B's returns a different combination of letters. So it's more of a substitution instead of rotation cypher.)
+(Run the binary with 10x A's as password, Ctrl+C out of it, and then rename the config file to AA.)
+~$ ./vending-machines
+Please enter the vending-machine-back-on code > ^C
+~$ mv vending-machines.json AA
+
+
+(Repeat with B's and renaming the config file to AB. C's and config file to AC. And so on with.)
+(Grep for password to get a neat printout to look at.)
+~$ $ grep password A*
+  AA:  "password": "XiGRehmwXi"
+  AB:  "password": "DqTpKv7fDq"
+  AC:  "password": "Lbn3UP9WLb"
+  ...
+
+
+(Visually match up character by character.)
+LVEdQPpBwr => CandyCane1
+
+
+(Run the binary and give it the password.)
+~$ ./vending-machines
+Please enter the vending-machine-back-on code > CandyCane1
+  Checking......
+
+  Vending machines enabled!!

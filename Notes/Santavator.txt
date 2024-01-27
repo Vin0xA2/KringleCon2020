@@ -1,0 +1,75 @@
+In-game terminal (SantavatorUnsolved.jpg)
+Objective: get the elevator operational.
+Hints:
+  More art than science.
+  Get colored lights into the receivers.
+  Color minigame might be bypassed with browser console.
+
+
+(Items are needed to direct the light particles and change colors.)
+  Broken Candycane: near the castle entrance.
+  Hex Nut (1): in castle first room, on the right, by the elevator.
+  Hex Nut (2): in castle room left of the first room, close to the right wall.
+  Green Bulb: in courtyard at the back of castle, in the back left.
+  Elevator Service Key: given by Sparkle Redberry in front of the elevator.
+
+
+(Open the panel by clicking the key.)
+(Use an object to direct a light particle to the green receiver.)
+(Put the green bulb over the particle to turn it green.)
+(Click the key to close the panel.)
+(Press the lobby button to complete the challenge.)
+  SantavatorGreen.jpg
+
+
+(With at least one button active, move to Burp Suite.)
+  Proxy > Open browser > right before clicking a floor button > Intercept
+
+
+(Intercepting the POST request, change the JSON value for targetFloor of your choice, and forward that. Ex: 3)
+  {
+    "targetFloor":"3",
+    "id":"<someID>"
+  }
+
+
+(Forward the next message changing the floor in the action to the floor of your choice.)
+  {
+    "type":"COMPLETE_CHALLENGE",
+    "resourceId":"<someID>",
+    "hash":"<someHash>",
+    "action":"goToFloor-3"
+  }
+
+
+(Turn off Intercept to let the rest of the message play out to get to the target floor.)
+  {
+    "type":"HIDE_SPINNER"
+  }
+
+
+(Available floors: 1, 1.5, 2, 3, r)
+
+
+(Items for the Santavator after powering the green receiver.)
+  Red Bulb: in castle second floor, in the back right.
+  Portal Candies: open the door and enable the Vending Machine through the Speaker UNPrep challenge, then interact with the vending machine enough times to get them.
+  Elevator 1.5 Button: open the door throught the Speaker UNPrep challenge, enter the newly open room, it's in the lower right corner.
+
+
+(Light up the red receiver to access the workshop and roof.)
+  SantavatorRed.jpg
+
+
+(Items for the Santavator after powering the red receiver.)
+  Yellow Bulb: in the castle roof top, in the back left, next to the sleigh.
+
+
+(Light up the yellow receiver to enable the button for Santa's Office. But we need a fingerprint.)
+  SantavatorYellow.jpg
+
+
+(Items for the Santavator after powering the yellow receiver.)
+  Large Marble: on the workshop floor, first room, right of to the first table.
+  Rubber Ball: on the workshop floor, second room, bottom right corner.
+  Proxmark3: not for the Santavator, but in the middle of the same room where the rubber ball is found.

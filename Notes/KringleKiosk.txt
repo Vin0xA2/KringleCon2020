@@ -1,0 +1,27 @@
+In-game terminal
+Objective: Escape the menu by launching /bin/bash.
+Hint: https://owasp.org/www-community/attacks/Command_Injection
+
+
+(Menu options are 1 through 5. Everything else displays an error message. Not even Ctrl+C or Ctrl+D works.)
+(Exploring the menu, 4. Print Name Badge option let's you type name. So try the ; to inject command to run the shell.)
+
+Enter choice [1 - 5] 4
+Enter your name...Vin0xA2; /bin/bash
+ _________
+< Vin0xA2 >
+ ---------
+  \
+   \   \_\_    _/_/
+    \      \__/
+           (oo)\_______
+           (__)\       )\/\
+               ||----w |
+               ||     ||
+
+   ___                                                      _    
+  / __|   _  _     __      __      ___     ___     ___     | |   
+  \__ \  | +| |   / _|    / _|    / -_)   (_-<    (_-<     |_|   
+  |___/   \_,_|   \__|_   \__|_   \___|   /__/_   /__/_   _(_)_  
+_|"""""|_|"""""|_|"""""|_|"""""|_|"""""|_|"""""|_|"""""|_| """ | 
+"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-' 

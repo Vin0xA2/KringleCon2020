@@ -1,0 +1,62 @@
+blockchain.dat
+Objective: Last block in blockchain.dat is 129996. What is the nonce for block 130000 (16char hex value)?
+Hints:
+  https://github.com/kmyk/mersenne-twister-predictor/blob/master/readme.md
+  https://download.holidayhackchallenge.com/2020/OfficialNaughtyNiceBlockchainEducationPack.zip
+  https://github.com/corkami/collisions
+  (3rd hint doesn't actually apply to this part)
+
+
+(Unzip OfficialNaughtyNiceBlockchainEducationPack.zip to find naughty_nice.py)
+(The python script has details about the blockchain and the functions to parse it.)
+(Drop blockchain.dat in the unzipped folder.)
+(The python script will use official_public.pem to decrypt blockchain.dat)
+(The Block() class generates a random 64bit number.)
+  ...
+  self.nonce = random.randrange(0xFFFFFFFFFFFFFFFF)
+  ...
+
+
+(Mersenne Twister and predictor from the Snowball fight challenge works with 32bits.)
+(Looking around the internet, to go from 32bits to 64bits, the implementation simply generates 2 random values and concatenate them.)
+(Comment out the first part of the python script under main and add the following code to print the nonce of each block 32bits at a time.)
+
+
+    with open('official_public.pem', 'rb') as fh:
+        official_public_key = RSA.importKey(fh.read())
+    c2 = Chain(load=True, filename='blockchain.dat')
+    print('C2: Block chain verify: %s' % (c2.verify_chain(official_public_key)))
+    for singleBlock in c2.blocks:
+        nonce = singleBlock.nonce
+        print(str(nonce & 0xFFFFFFFF))  #32 least significant bits
+        print(str(nonce >> 32))  #32 most significant bits
+
+
+(Run the python script and dump the nonce into a file.)
+~$ ./naughty_nice.py > nonceMT.txt
+
+
+(Feed the last 624 numbers to the Mersenne Twister predictor.)
+~$ tail -624 nonceMT.txt | mt19937predict > p1.txt
+
+
+(Ctrl+C to stop it right away and then get the 7th and 8th predictions.)
+~$ head -8 p1.txt | tail -2
+
+
+(Convert them to base 16 with CyberChef.)
+(Recipe)
+  Fork('\\n','\\n',false)
+  To_Base(16)
+(Input)
+  4079973021
+  1460036376
+(Output)
+  f32f729d
+  57066318
+
+
+(Concatenate them to get the answer.)
+
+
+Answer: 57066318f32f729d

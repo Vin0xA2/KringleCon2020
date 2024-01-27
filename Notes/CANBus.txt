@@ -1,0 +1,83 @@
+In-game terminal
+Objective: Find the unlock code in the candump log.
+Hints:
+  https://www.youtube.com/watch?v=96u-uHRBI0I
+  Hide lines with commands like cat file.txt | grep -v badstuff
+  (or grep -v badstuff file.txt)
+
+
+(Inital Message)
+  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMWX00OkxxddcddxxkOO0XWMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+  MMMMMMMMMMMMMMMMMMMMMMMWXOxoc:c.;cccccc.ccccc:.:c:ldxOXMMMMMMMMMMMMMMMMMMMMMMM
+  MMMMMMMMMMMMMMMMMMMMXkoc',ccccc:.:ccccc.ccccc.;cccc,'::cdOXMMMMMMMMMMMMMMMMMMM
+  MMMMMMMMMMMMMMMMM0xc:cccc,':cccc::ccccccccccccccc:.;cccccc:lxXMMMMMMMMMMMMMMMM
+  MMMMMMMMMMMMMMNkl,',:ccccc;;ccccccccccccccccccccc::cccccc:,',:lOWMMMMMMMMMMMMM
+  MMMMMMMMMMMMNxccccc;';cccccccccccccccccccccccccccccccccc;':cccccckWMMMMMMMMMMM
+  MMMMMMMMMMNdcccccc:..;cccccccccccccccccccccccccccccccccccccccccccc:kWMMMMMMMMM
+  MMMMMMMMM0c,,,,:cccc;..;cccccccccccccccccccccccccccccccccccccc:,,,;:lKMMMMMMMM
+  MMMMMMMWd:cccc;:cccccc;..,cccccccccccccccccccccccccccccccccccc;:cccccckMMMMMMM
+  MMMMMMNlcccccccccccccccc:..,:ccccccccccccccccccccccccccccccccccccccccc:oWMMMMM
+  MMMMMNc,,,,,:ccccccccccccc:..':cccccccccccccccccccccccccccccccccc:,,,,,;oWMMMM
+  MMMMWoccccc::ccccccccccccccc:'.':cccccccccccccccccccccccccccccccc::ccccccxMMMM
+  MMMMkccccccccccccccccccccccccc:'..:cccccccccccccccccccccccccccccccccccccc:0MMM
+  MMMN::cccccccccccccccccccccccccc:'..:cccccccccccccccccccccccccccccccccccc:cWMM
+  MMMk,,,,,:cccccccccccccccccccccccc:,..;ccccccccccccccccccccccccccccc:,,,,,;0MM
+  MMMlccccccccccccccccccccccccccccccccc,.;cccccccccccccccccccccccccccccccccccdMM
+  MMW:ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccclMM
+  MMWOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO0MM
+  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+
+  Welcome to the CAN bus terminal challenge!
+
+  In your home folder, there's a CAN bus capture from Santa's sleigh. Some of
+  the data has been cleaned up, so don't worry - it isn't too noisy. What you
+  will see is a record of the engine idling up and down. Also in the data are
+  a LOCK signal, an UNLOCK signal, and one more LOCK. Can you find the UNLOCK?
+  We'd like to encode another key mechanism.
+
+  Find the decimal portion of the timestamp of the UNLOCK code in candump.log
+  and submit it to ./runtoanswer!  (e.g., if the timestamp is 123456.112233,
+  please submit 112233)
+
+
+(Let's see how the log file looks.)
+~$ head candump.log
+  (1608926660.800530) vcan0 244#0000000116
+  (1608926660.812774) vcan0 244#00000001D3
+  (1608926660.826327) vcan0 244#00000001A6
+  (1608926660.839338) vcan0 244#00000001A3
+  (1608926660.852786) vcan0 244#00000001B4
+  (1608926660.866754) vcan0 244#000000018E
+  (1608926660.879825) vcan0 244#000000015F
+  (1608926660.892934) vcan0 244#0000000103
+  (1608926660.904816) vcan0 244#0000000181
+  (1608926660.920799) vcan0 244#000000015F
+
+
+(Let's what values are available in the vcan0 column.)
+~$ cut -d " " -f 2 candump.log | sort | uniq -c
+  1369 vcan0
+
+
+(There is only 1 value, so column is unimportant.)
+(Let's try the 3 digit CAN-ID before the # sign.)
+~$ cut -d " " -f 3 candump.log | cut -d "#" -f 1 | sort | uniq -c
+    35 188
+     3 19B
+  1331 244
+
+
+(Lock, unlock, and lock again. That's 3 lines. So search for 19B.)
+~$ grep 19B# candump.log
+  (1608926664.626448) vcan0 19B#000000000000
+  (1608926671.122520) vcan0 19B#00000F000000
+  (1608926674.092148) vcan0 19B#000000000000
+
+
+(122520 looks like our decimal value.)
+~$ ./runtoanswer 122520
+  Your answer: 122520
+
+  Checking....
+  Your answer is correct!
